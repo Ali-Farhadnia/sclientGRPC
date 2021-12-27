@@ -1,53 +1,23 @@
 package main
 
 import (
-	"log"
-
-	mainfunctions "github.com/Ali-Farhadnia/clientGRPC/MainFunctions"
 	"github.com/Ali-Farhadnia/clientGRPC/cmd"
-	userinput "github.com/Ali-Farhadnia/clientGRPC/models/UserInput"
+	"github.com/Ali-Farhadnia/clientGRPC/models/input"
+	"github.com/jessevdk/go-flags"
 )
 
-var input userinput.UserInput
+var myinput *input.Input
 
 func main() {
-	//set log flag
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	err := cmd.ConfigGRPC()
+	err := cmd.SetConfig()
 	if err != nil {
 		panic(err)
 	}
-	err = cmd.ConfigMainFuncs()
+	myinput = input.NewInput()
+	parser := flags.NewParser(myinput, flags.Default)
+	_, err = parser.Parse()
 	if err != nil {
 		panic(err)
 	}
-	flag := true
-	for {
-		if flag {
-			s, _ := mainfunctions.Help("")
-			input.Output = s
-			input.ShowOutput()
-			flag = false
-		}
-
-		err = input.Getinput()
-		if err != nil {
-			continue
-		}
-
-		err = input.ParseInput()
-		if err != nil {
-			input.ShowOutput()
-			continue
-		}
-
-		err = input.HandleInput()
-		if err != nil {
-			continue
-		}
-
-		_ = input.ShowOutput()
-
-	}
+	(*myinput).Handel()
 }

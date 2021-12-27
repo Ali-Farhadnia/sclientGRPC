@@ -10,8 +10,8 @@ import (
 
 //GetCRUDClient() set  modelpb.CRUDClient with client
 func GetCRUDClient() (modelpb.CRUDClient, error) {
-	fmt.Println("Hello i am a client")
-	target := config.App.GRPCconfig.Host + ":" + config.App.GRPCconfig.Port
+	fmt.Println("Hello i am client")
+	target := config.App.Config.GrpcConfig.Host + ":" + config.App.Config.GrpcConfig.Port
 	cc, err := grpc.Dial(target, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
