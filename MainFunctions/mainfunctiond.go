@@ -2,7 +2,6 @@ package mainfunctions
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -47,10 +46,10 @@ func InsertOneBook(input string) (string, error) {
 	return Status.Description, nil
 }
 func InsertManyBooks(input string) (string, error) {
-	fmt.Println("in InsertManyBooks")
-	defer fmt.Println("in InsertManyBooks")
+	//fmt.Println("in InsertManyBooks")
+	//defer fmt.Println("in InsertManyBooks")
 	books, err := UnarshalString_many(input)
-	fmt.Println(books)
+	//fmt.Println(books)
 	if err != nil {
 		return "unvalid input", err
 	}
@@ -59,7 +58,7 @@ func InsertManyBooks(input string) (string, error) {
 	}
 	grpcbooklist := []*modelpb.Book{}
 	for _, book := range books {
-		fmt.Println(book)
+		//fmt.Println(book)
 		Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
 		if err != nil {
 			return "", err
@@ -190,24 +189,24 @@ func UnarshalString_one(input string) (map[string]string, error) {
 
 //get json string and parse it to the books
 func UnarshalString_many(input string) ([]map[string]string, error) {
-	fmt.Println("in UnarshalString_many")
-	defer fmt.Println("in UnarshalString_many")
+	//fmt.Println("in UnarshalString_many")
+	//defer fmt.Println("in UnarshalString_many")
 	input = strings.ReplaceAll(input, "[", "")
-	fmt.Println(input)
+	//fmt.Println(input)
 	input = strings.ReplaceAll(input, "]", "")
-	fmt.Println(input)
+	//fmt.Println(input)
 	splited := strings.Split(input, "-")
-	fmt.Println(splited)
+	//fmt.Println(splited)
 	var splits []map[string]string
 	for _, v := range splited {
 		result, err := UnarshalString_one(v)
-		fmt.Println(result)
+		//fmt.Println(result)
 		if err != nil {
 			return nil, err
 		}
 		splits = append(splits, result)
 	}
-	fmt.Println(splits)
+	//fmt.Println(splits)
 
 	return splits, nil
 }
