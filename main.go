@@ -19,5 +19,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	(*myinput).Handel()
+	myinput.Handel()
 }

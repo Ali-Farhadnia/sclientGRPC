@@ -26,6 +26,7 @@ func (a *AppConfig) SetConfig() error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -36,5 +37,5 @@ type Application struct {
 }
 
 func NewApp() *Application {
-	return &Application{AppConfig{GrpcConfig{}}, nil, make(map[string]func(string) (string, error), 0)}
+	return &Application{AppConfig{GrpcConfig{"", ""}}, nil, make(map[string]func(string) (string, error))}
 }

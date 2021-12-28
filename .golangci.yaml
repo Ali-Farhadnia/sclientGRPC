@@ -13,3 +13,6 @@ linters:
     - varnamelen
     - dupl
     - paralleltest
+    - wsl
+    - wrapcheck
+    - govet

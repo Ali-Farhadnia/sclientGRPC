@@ -18,7 +18,7 @@ func SetConfig() error {
 	}
 	config.App.GrpcClient = client
 
-	//set main funcs
+	// set main funcs
 	config.App.Tasks["insert_one"] = mainfunctions.InsertOneBook
 	config.App.Tasks["insert_many"] = mainfunctions.InsertManyBooks
 	config.App.Tasks["update"] = mainfunctions.UpdateBook

@@ -10,16 +10,16 @@ import (
 	"github.com/Ali-Farhadnia/clientGRPC/models/modelpb"
 )
 
-//all the functions get string as input then pars that string and send it to grpc server
+// all the functions get string as input then pars that string and send it to grpc server.
+const unvalid = "unvalid input"
 
 func InsertOneBook(input string) (string, error) {
-
-	book, err := UnarshalString_one(input)
+	book, err := UnarshalStringOne(input)
 	if err != nil {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	if !checknull(book) {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	grpcbooklist := []*modelpb.Book{}
 	Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
@@ -43,22 +43,19 @@ func InsertOneBook(input string) (string, error) {
 	if Status.Status == "no" {
 		return "somthing went wrong:" + Status.Description, err
 	}
+
 	return Status.Description, nil
 }
 func InsertManyBooks(input string) (string, error) {
-	//fmt.Println("in InsertManyBooks")
-	//defer fmt.Println("in InsertManyBooks")
-	books, err := UnarshalString_many(input)
-	//fmt.Println(books)
+	books, err := UnarshalStringMany(input)
 	if err != nil {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	if !checknulls(books) {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	grpcbooklist := []*modelpb.Book{}
 	for _, book := range books {
-		//fmt.Println(book)
 		Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
 		if err != nil {
 			return "", err
@@ -80,15 +77,16 @@ func InsertManyBooks(input string) (string, error) {
 	if Status.Status == "no" {
 		return "somthing whent wrong:" + Status.Description, err
 	}
+
 	return Status.Description, nil
 }
 func UpdateBook(input string) (string, error) {
-	book, err := UnarshalString_one(input)
+	book, err := UnarshalStringOne(input)
 	if err != nil {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	if !checknull(book) {
-		return "unvalid input", err
+		return unvalid, err
 	}
 	Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
 	if err != nil {
@@ -114,6 +112,7 @@ func UpdateBook(input string) (string, error) {
 	if Status.Status == "no" {
 		return "somthing whent wrong:" + Status.Description, err
 	}
+
 	return Status.Description, nil
 
 }
@@ -126,6 +125,7 @@ func DeleteBook(input string) (string, error) {
 	if Status.Status == "no" {
 		return "somthing whent wrong:" + Status.Description, err
 	}
+
 	return Status.Description, nil
 }
 func FindBookByID(input string) (string, error) {
@@ -149,11 +149,12 @@ func FindBookByID(input string) (string, error) {
 	if err != nil {
 		return "somthing whent wrong", err
 	}
+
 	return sres, nil
 
 }
 
-//each time  Help(string) called it returns help string
+// each time  Help(string) called it returns help string.
 func Help(string) (string, error) {
 	help := `
 	Functions:
@@ -169,12 +170,13 @@ func Help(string) (string, error) {
 
 		find_by_id:           e.g.value=string
 	`
+
 	return help, nil
 
 }
 
-//get json string and parse it to the book
-func UnarshalString_one(input string) (map[string]string, error) {
+// get json string and parse it to the book.
+func UnarshalStringOne(input string) (map[string]string, error) {
 	input = strings.ReplaceAll(input, "}", "")
 	input = strings.ReplaceAll(input, "{", "")
 	splited := strings.Split(input, ",")
@@ -187,26 +189,19 @@ func UnarshalString_one(input string) (map[string]string, error) {
 	return m, nil
 }
 
-//get json string and parse it to the books
-func UnarshalString_many(input string) ([]map[string]string, error) {
-	//fmt.Println("in UnarshalString_many")
-	//defer fmt.Println("in UnarshalString_many")
+// get json string and parse it to the books.
+func UnarshalStringMany(input string) ([]map[string]string, error) {
 	input = strings.ReplaceAll(input, "[", "")
-	//fmt.Println(input)
 	input = strings.ReplaceAll(input, "]", "")
-	//fmt.Println(input)
 	splited := strings.Split(input, "-")
-	//fmt.Println(splited)
 	var splits []map[string]string
 	for _, v := range splited {
-		result, err := UnarshalString_one(v)
-		//fmt.Println(result)
+		result, err := UnarshalStringOne(v)
 		if err != nil {
 			return nil, err
 		}
 		splits = append(splits, result)
 	}
-	//fmt.Println(splits)
 
 	return splits, nil
 }
@@ -215,6 +210,7 @@ func checknull(m map[string]string) bool {
 	if m["name"] == "" || m["author"] == "" || m["inventory"] == "0" || m["Pagecount"] == "0" {
 		return false
 	}
+
 	return true
 }
 func checknulls(ms []map[string]string) bool {
@@ -223,5 +219,6 @@ func checknulls(ms []map[string]string) bool {
 			return false
 		}
 	}
+
 	return true
 }

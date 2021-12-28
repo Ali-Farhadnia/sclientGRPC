@@ -16,7 +16,6 @@ func NewInput() *Input {
 }
 
 func (i Input) Handel() {
-	//fmt.Println(i)
 	result, err := config.App.Tasks[i.Key](i.Value)
 	if err != nil {
 		fmt.Println(err)
