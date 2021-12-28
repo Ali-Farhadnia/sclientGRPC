@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Ali-Farhadnia/clientGRPC/config"
 	"github.com/Ali-Farhadnia/clientGRPC/models/book"
 	"github.com/Ali-Farhadnia/clientGRPC/models/modelpb"
 )
@@ -13,7 +12,7 @@ import (
 // all the functions get string as input then pars that string and send it to grpc server.
 const unvalid = "unvalid input"
 
-func InsertOneBook(input string) (string, error) {
+func InsertOneBook(input string, client modelpb.CRUDClient) (string, error) {
 	book, err := UnarshalStringOne(input)
 	if err != nil {
 		return unvalid, err
@@ -35,7 +34,7 @@ func InsertOneBook(input string) (string, error) {
 	var grpcbooks = modelpb.Books{
 		Books: grpcbooklist,
 	}
-	Status, err := config.App.GrpcClient.InsertBook(context.Background(), &grpcbooks)
+	Status, err := client.InsertBook(context.Background(), &grpcbooks)
 	if err != nil {
 		return "somthing whent wrong", err
 	}
@@ -46,7 +45,7 @@ func InsertOneBook(input string) (string, error) {
 
 	return Status.Description, nil
 }
-func InsertManyBooks(input string) (string, error) {
+func InsertManyBooks(input string, client modelpb.CRUDClient) (string, error) {
 	books, err := UnarshalStringMany(input)
 	if err != nil {
 		return unvalid, err
@@ -70,7 +69,7 @@ func InsertManyBooks(input string) (string, error) {
 	var grpcbooks = modelpb.Books{
 		Books: grpcbooklist,
 	}
-	Status, err := config.App.GrpcClient.InsertBook(context.Background(), &grpcbooks)
+	Status, err := client.InsertBook(context.Background(), &grpcbooks)
 	if err != nil {
 		return "somthing whent wrong", err
 	}
@@ -80,7 +79,7 @@ func InsertManyBooks(input string) (string, error) {
 
 	return Status.Description, nil
 }
-func UpdateBook(input string) (string, error) {
+func UpdateBook(input string, client modelpb.CRUDClient) (string, error) {
 	book, err := UnarshalStringOne(input)
 	if err != nil {
 		return unvalid, err
@@ -105,20 +104,7 @@ func UpdateBook(input string) (string, error) {
 			Inventory:  Inventory}, Id: book["id"],
 	}
 
-	Status, err := config.App.GrpcClient.UpdateBook(context.Background(), &rec)
-	if err != nil {
-		return "somthing whent wrong", err
-	}
-	if Status.Status == "no" {
-		return "somthing whent wrong:" + Status.Description, err
-	}
-
-	return Status.Description, nil
-
-}
-func DeleteBook(input string) (string, error) {
-	rec := modelpb.BookID{Id: input}
-	Status, err := config.App.GrpcClient.DeleteBook(context.Background(), &rec)
+	Status, err := client.UpdateBook(context.Background(), &rec)
 	if err != nil {
 		return "somthing whent wrong", err
 	}
@@ -128,9 +114,21 @@ func DeleteBook(input string) (string, error) {
 
 	return Status.Description, nil
 }
-func FindBookByID(input string) (string, error) {
+func DeleteBook(input string, client modelpb.CRUDClient) (string, error) {
 	rec := modelpb.BookID{Id: input}
-	res, err := config.App.GrpcClient.FindBookById(context.Background(), &rec)
+	Status, err := client.DeleteBook(context.Background(), &rec)
+	if err != nil {
+		return "somthing whent wrong", err
+	}
+	if Status.Status == "no" {
+		return "somthing whent wrong:" + Status.Description, err
+	}
+
+	return Status.Description, nil
+}
+func FindBookByID(input string, client modelpb.CRUDClient) (string, error) {
+	rec := modelpb.BookID{Id: input}
+	res, err := client.FindBookById(context.Background(), &rec)
 	if err != nil {
 		return "somthing whent wrong", err
 	}
@@ -151,11 +149,10 @@ func FindBookByID(input string) (string, error) {
 	}
 
 	return sres, nil
-
 }
 
 // each time  Help(string) called it returns help string.
-func Help(string) (string, error) {
+func Help() (string, error) {
 	help := `
 	Functions:
 
@@ -172,7 +169,6 @@ func Help(string) (string, error) {
 	`
 
 	return help, nil
-
 }
 
 // get json string and parse it to the book.
@@ -221,4 +217,16 @@ func checknulls(ms []map[string]string) bool {
 	}
 
 	return true
+}
+
+// return main functions as a map
+func GetMainFuncs() map[string]func(string, modelpb.CRUDClient) (string, error) {
+	funcs := make(map[string]func(string, modelpb.CRUDClient) (string, error))
+	// set main funcs
+	funcs["insert_one"] = InsertOneBook
+	funcs["insert_many"] = InsertManyBooks
+	funcs["update"] = UpdateBook
+	funcs["delete"] = DeleteBook
+	funcs["find_by_id"] = FindBookByID
+	return funcs
 }
