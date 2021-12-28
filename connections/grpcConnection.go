@@ -21,10 +21,8 @@ var GrpcOnce sync.Once
 func GetGrpcClient(host string, port string) (modelpb.CRUDClient, error) {
 	GrpcOnce.Do(func() {
 		target := host + ":" + port
-		cc, err := grpc.Dial(target, grpc.WithInsecure())
-		if err != nil {
-			clientInstanceError = err
-		}
+		var cc *grpc.ClientConn
+		cc, clientInstanceError = grpc.Dial(target, grpc.WithInsecure())
 		clientInstance = modelpb.NewCRUDClient(cc)
 	})
 
