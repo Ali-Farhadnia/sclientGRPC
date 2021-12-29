@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	mainfunctions "github.com/Ali-Farhadnia/clientGRPC/MainFunctions"
@@ -31,5 +33,10 @@ func main() {
 	// set main functions to handel input.
 	funcs := mainfunctions.GetMainFuncs()
 	// handel input
-	myinput.Handel(funcs, appconfig.GrpcConfig)
+	result, err := myinput.Handel(funcs, appconfig.GrpcConfig)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Println(result)
 }

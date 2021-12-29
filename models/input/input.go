@@ -1,8 +1,7 @@
 package input
 
 import (
-	"fmt"
-	"log"
+	"errors"
 
 	mainfunctions "github.com/Ali-Farhadnia/clientGRPC/MainFunctions"
 	"github.com/Ali-Farhadnia/clientGRPC/config"
@@ -19,21 +18,24 @@ func NewInput() *Input {
 	return &Input{}
 }
 
-func (i Input) Handel(fm map[string]func(string, modelpb.CRUDClient) (string, error), grpcconfig config.GrpcConfig) {
+func (i Input) Handel(fm map[string]func(string, modelpb.CRUDClient) (string, error), grpcconfig config.GrpcConfig) (string, error) {
 	if i.Key == "keylist" {
-		fmt.Println(mainfunctions.Help())
-		return
+		res, err := mainfunctions.Help()
+		if err != nil {
+			return "", err
+		}
+		return res, nil
 	}
 	client, err := connections.GetGrpcClient(grpcconfig.Host, grpcconfig.Port)
 	if err != nil {
-		log.Println(err)
-		return
+		return "", err
 	}
 	result, err := fm[i.Key](i.Value, client)
 	if err != nil {
-		fmt.Println(err)
+		return err.Error(), nil
 	}
 	if result != "" {
-		fmt.Println(result)
+		return result, nil
 	}
+	return "", errors.New("unvalid key")
 }
