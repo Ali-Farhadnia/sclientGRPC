@@ -2,6 +2,7 @@ package mainfunctions_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	mainfunctions "github.com/Ali-Farhadnia/clientGRPC/MainFunctions"
@@ -11,8 +12,11 @@ import (
 
 var id string
 
+const grpc_host = "37.152.177.253"
+const grpc_port = "8082"
+
 func TestInsertOneBook(t *testing.T) {
-	cli, err := connections.GetGrpcClient("37.152.177.253", "8082")
+	cli, err := connections.GetGrpcClient(grpc_host, grpc_port)
 	if err != nil {
 		t.Error("some error:", err)
 	}
@@ -24,6 +28,7 @@ func TestInsertOneBook(t *testing.T) {
 	} else {
 		id = res
 	}
+	id = strings.ReplaceAll(id, "\n", "")
 	if res == "" {
 		t.Error("InsertOneBook failed")
 	}
@@ -60,7 +65,7 @@ func TestInsertOneBook(t *testing.T) {
 	}
 	/*
 		// grpc error
-		cli, err = connections.GetGrpcClient("48.8.2.1", "8086")
+		cli, err = connections.GetGrpcClient(grpc_host, grpc_port)
 		if err != nil {
 			t.Error("some error:", err)
 		}
@@ -74,7 +79,7 @@ func TestInsertOneBook(t *testing.T) {
 }
 
 func TestInsertManyBooks(t *testing.T) {
-	cli, err := connections.GetGrpcClient("37.152.177.253", "8082")
+	cli, err := connections.GetGrpcClient(grpc_host, grpc_port)
 	if err != nil {
 		t.Error("some error:", err)
 	}
@@ -120,7 +125,7 @@ func TestInsertManyBooks(t *testing.T) {
 	}
 	/*
 		// grpc error
-		cli, err = connections.GetGrpcClient("48.8.2.1", "8086")
+		cli, err = connections.GetGrpcClient(123, 123)
 		if err != nil {
 			t.Error("some error:", err)
 		}
@@ -133,7 +138,7 @@ func TestInsertManyBooks(t *testing.T) {
 }
 
 func TestUpdateBook(t *testing.T) {
-	cli, err := connections.GetGrpcClient("37.152.177.253", "8082")
+	cli, err := connections.GetGrpcClient(grpc_host, grpc_port)
 	if err != nil {
 		t.Error("some error:", err)
 	}
@@ -190,8 +195,41 @@ func TestUpdateBook(t *testing.T) {
 		}
 	*/
 }
+
+func TestFindBookByID(t *testing.T) {
+	cli, err := connections.GetGrpcClient(grpc_host, grpc_port)
+	if err != nil {
+		t.Error("some error:", err)
+	}
+	b := book.Book{ID: id, Name: "test1", Author: "test1", Pagecount: 50, Inventory: 50}
+
+	res, err := mainfunctions.FindBookByID(b.ID, cli)
+	if err != nil {
+		t.Errorf("FindBookByID failed. id:%s , err:%e", id, err)
+	}
+	sb, err := b.ToString()
+	if err != nil {
+		t.Errorf("FindBookByID failed. id:%s , err:%e", id, err)
+	}
+	if res != sb {
+		t.Errorf("FindBookByID failed. id:                                                                    /%s/ ,result:%s , err:%e", id, res, err)
+	}
+
+	// wrong input.
+	test2 := "1234"
+	res, err = mainfunctions.UpdateBook(test2, cli)
+	if err == nil || res != mainfunctions.Unvalid {
+		t.Error("FindBookByID wrong input failed")
+	}
+	// empty input.
+	test3 := ``
+	res, err = mainfunctions.UpdateBook(test3, cli)
+	if err == nil || res != mainfunctions.Unvalid {
+		t.Error("FindBookByID empty input failed")
+	}
+}
 func TestDeleteBook(t *testing.T) {
-	cli, err := connections.GetGrpcClient("37.152.177.253", "8082")
+	cli, err := connections.GetGrpcClient("37.152.177.253", "8083")
 	if err != nil {
 		t.Error("some error:", err)
 	}
@@ -210,38 +248,6 @@ func TestDeleteBook(t *testing.T) {
 	res, err = mainfunctions.UpdateBook(test3, cli)
 	if err == nil || res != mainfunctions.Unvalid {
 		t.Error("UpdateBook empty input failed")
-	}
-}
-func TestFindBookByID(t *testing.T) {
-	cli, err := connections.GetGrpcClient("37.152.177.253", "8082")
-	if err != nil {
-		t.Error("some error:", err)
-	}
-	b := book.Book{ID: id, Name: "test1", Author: "test1", Pagecount: 50, Inventory: 50}
-
-	res, err := mainfunctions.FindBookByID(b.ID, cli)
-	if err != nil {
-		t.Errorf("FindBookByID failed. id:%s , err:%e", id, err)
-	}
-	sb, err := b.ToString()
-	if err != nil {
-		t.Errorf("FindBookByID failed. id:%s , err:%e", id, err)
-	}
-	if res != sb {
-		t.Errorf("FindBookByID failed. id:%s ,result:%s , err:%e", id, res, err)
-	}
-
-	// wrong input.
-	test2 := "1234"
-	res, err = mainfunctions.UpdateBook(test2, cli)
-	if err == nil || res != mainfunctions.Unvalid {
-		t.Error("FindBookByID wrong input failed")
-	}
-	// empty input.
-	test3 := ``
-	res, err = mainfunctions.UpdateBook(test3, cli)
-	if err == nil || res != mainfunctions.Unvalid {
-		t.Error("FindBookByID empty input failed")
 	}
 }
 
