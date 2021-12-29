@@ -13,7 +13,7 @@ import (
 var id string
 
 const grpc_host = "37.152.177.253"
-const grpc_port = "8082"
+const grpc_port = "8083"
 
 func TestInsertOneBook(t *testing.T) {
 	cli, err := connections.GetGrpcClient(grpc_host, grpc_port)

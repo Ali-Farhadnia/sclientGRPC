@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	mainfunctions "github.com/Ali-Farhadnia/clientGRPC/MainFunctions"
-	"github.com/Ali-Farhadnia/clientGRPC/config"
 	"github.com/Ali-Farhadnia/clientGRPC/connections"
 	"github.com/Ali-Farhadnia/clientGRPC/models/modelpb"
 )
@@ -18,7 +17,7 @@ func NewInput() *Input {
 	return &Input{}
 }
 
-func (i Input) Handel(fm map[string]func(string, modelpb.CRUDClient) (string, error), grpcconfig config.GrpcConfig) (string, error) {
+func (i Input) Handel(fm map[string]func(string, modelpb.CRUDClient) (string, error), host string, port string) (string, error) {
 	if i.Key == "keylist" {
 		res, err := mainfunctions.Help()
 		if err != nil {
@@ -26,16 +25,16 @@ func (i Input) Handel(fm map[string]func(string, modelpb.CRUDClient) (string, er
 		}
 		return res, nil
 	}
-	client, err := connections.GetGrpcClient(grpcconfig.Host, grpcconfig.Port)
+	client, err := connections.GetGrpcClient(host, port)
 	if err != nil {
 		return "", err
+	}
+	if fm[i.Key] == nil {
+		return "", errors.New("unvalid key")
 	}
 	result, err := fm[i.Key](i.Value, client)
 	if err != nil {
 		return err.Error(), nil
 	}
-	if result != "" {
-		return result, nil
-	}
-	return "", errors.New("unvalid key")
+	return result, nil
 }

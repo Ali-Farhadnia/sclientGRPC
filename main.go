@@ -33,7 +33,7 @@ func main() {
 	// set main functions to handel input.
 	funcs := mainfunctions.GetMainFuncs()
 	// handel input
-	result, err := myinput.Handel(funcs, appconfig.GrpcConfig)
+	result, err := myinput.Handel(funcs, appconfig.GrpcConfig.Host, appconfig.GrpcConfig.Port)
 	if err != nil {
 		log.Println(err)
 		return

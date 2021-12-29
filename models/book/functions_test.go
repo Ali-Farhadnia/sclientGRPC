@@ -14,7 +14,7 @@ func TestToString(t *testing.T) {
 		t.Error("some error:", err)
 	}
 	if bs != res {
-		t.Error(res)
+		t.Error("ToString failed", res)
 	}
 
 }
