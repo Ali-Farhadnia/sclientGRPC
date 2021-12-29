@@ -1,8 +1,8 @@
 
--k=insert_one -v={"name":"test1","author":"test1","pagecount":50,"inventory":50}
+-k=insert_one -v={name:test1,author:test1,pagecount:50,inventory:50}
 
--k=insert_many -v=[{"name":"test1","author":"test1","pagecount":50,"inventory":50}-{"name":"test2","author":"test1","pagecount":50,"inventory":50}-{"name":"test3","author":"test1","pagecount":50,"inventory":50}]
+-k=insert_many -v=[{name:test1,author:test1,pagecount:50,inventory:50}-{name:test2,author:test1,pagecount:50,inventory:50}-{name:test3,author:test1,pagecount:50,inventory:50}]
 
--k=update -v={"id":"","name":"test1","author":"test1","pagecount":50,"inventory":50}
+-k=update -v={id:,name:test1,author:test1,pagecount:50,inventory:50}
 
--k=delete -v=""
+-k=delete -v=

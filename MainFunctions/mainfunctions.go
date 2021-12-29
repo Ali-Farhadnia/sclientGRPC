@@ -2,6 +2,7 @@ package mainfunctions
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -10,15 +11,19 @@ import (
 )
 
 // all the functions get string as input then pars that string and send it to grpc server.
-const unvalid = "unvalid input"
+const Unvalid = "unvalid input "
+const Somthingwrong = "somthing whent wrong "
 
 func InsertOneBook(input string, client modelpb.CRUDClient) (string, error) {
+	if input == "" {
+		return Unvalid, errors.New("empty input")
+	}
 	book, err := UnarshalStringOne(input)
 	if err != nil {
-		return unvalid, err
+		return Unvalid, err
 	}
-	if !checknull(book) {
-		return unvalid, err
+	if !Checknull(book) {
+		return Unvalid, errors.New("some fiels is null")
 	}
 	grpcbooklist := []*modelpb.Book{}
 	Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
@@ -36,22 +41,25 @@ func InsertOneBook(input string, client modelpb.CRUDClient) (string, error) {
 	}
 	Status, err := client.InsertBook(context.Background(), &grpcbooks)
 	if err != nil {
-		return "somthing whent wrong", err
+		return Somthingwrong, err
 	}
 
 	if Status.Status == "no" {
-		return "somthing went wrong:" + Status.Description, err
+		return Somthingwrong + Status.Description, err
 	}
 
 	return Status.Description, nil
 }
 func InsertManyBooks(input string, client modelpb.CRUDClient) (string, error) {
+	if input == "" {
+		return Unvalid, errors.New("empty input")
+	}
 	books, err := UnarshalStringMany(input)
 	if err != nil {
-		return unvalid, err
+		return Unvalid, err
 	}
-	if !checknulls(books) {
-		return unvalid, err
+	if !Checknulls(books) {
+		return Unvalid, errors.New("some fiels is null")
 	}
 	grpcbooklist := []*modelpb.Book{}
 	for _, book := range books {
@@ -74,18 +82,21 @@ func InsertManyBooks(input string, client modelpb.CRUDClient) (string, error) {
 		return "somthing whent wrong", err
 	}
 	if Status.Status == "no" {
-		return "somthing whent wrong:" + Status.Description, err
+		return Somthingwrong + Status.Description, err
 	}
 
 	return Status.Description, nil
 }
 func UpdateBook(input string, client modelpb.CRUDClient) (string, error) {
+	if input == "" {
+		return Unvalid, errors.New("empty input")
+	}
 	book, err := UnarshalStringOne(input)
 	if err != nil {
-		return unvalid, err
+		return Unvalid, err
 	}
-	if !checknull(book) {
-		return unvalid, err
+	if !Checknull(book) {
+		return Unvalid, errors.New("some fiels is null")
 	}
 	Pagescount, err := strconv.ParseInt(book["pagecount"], 10, 32)
 	if err != nil {
@@ -106,34 +117,40 @@ func UpdateBook(input string, client modelpb.CRUDClient) (string, error) {
 
 	Status, err := client.UpdateBook(context.Background(), &rec)
 	if err != nil {
-		return "somthing whent wrong", err
+		return Somthingwrong, err
 	}
 	if Status.Status == "no" {
-		return "somthing whent wrong:" + Status.Description, err
+		return Somthingwrong + Status.Description, err
 	}
 
 	return Status.Description, nil
 }
 func DeleteBook(input string, client modelpb.CRUDClient) (string, error) {
+	if input == "" {
+		return Unvalid, errors.New("empty input")
+	}
 	rec := modelpb.BookID{Id: input}
 	Status, err := client.DeleteBook(context.Background(), &rec)
 	if err != nil {
-		return "somthing whent wrong", err
+		return Somthingwrong, err
 	}
 	if Status.Status == "no" {
-		return "somthing whent wrong:" + Status.Description, err
+		return Somthingwrong + Status.Description, err
 	}
 
 	return Status.Description, nil
 }
 func FindBookByID(input string, client modelpb.CRUDClient) (string, error) {
+	if input == "" {
+		return Unvalid, errors.New("empty input")
+	}
 	rec := modelpb.BookID{Id: input}
 	res, err := client.FindBookById(context.Background(), &rec)
 	if err != nil {
-		return "somthing whent wrong", err
+		return Somthingwrong, err
 	}
 	if res.Status.Status == "no" {
-		return "somthing whent wrong:" + res.Status.Description, err
+		return Somthingwrong + res.Status.Description, err
 	}
 	resbook := book.Book{
 		ID:        res.Book.Id,
@@ -145,7 +162,7 @@ func FindBookByID(input string, client modelpb.CRUDClient) (string, error) {
 
 	sres, err := resbook.ToString()
 	if err != nil {
-		return "somthing whent wrong", err
+		return Somthingwrong, err
 	}
 
 	return sres, nil
@@ -156,12 +173,12 @@ func Help() (string, error) {
 	help := `
 	Functions:
 
-		insert_one:		e.g. value={"name":string,"author":string,"pagecount": integer,"Inventory":integer}
+		insert_one:		e.g. value={name:string,author:string,pagecount: integer,Inventory:integer}
 
-		insert_many:        e.g.value=[{"name":string,"author":string,"pagecount": integer,"Inventory":integer},
-								{"name":string,"author":string,"pagecount": integer,"Inventory":integer}]
+		insert_many:        e.g.value=[{name:string,author:string,pagecount: integer,Inventory:integer},
+								{name:string,author:string,pagecount: integer,Inventory:integer}]
 
-		update:		e.g.value={"id":string,"name":string,"author":string,"pagecount": integer,"Inventory":integer}
+		update:		e.g.value={id:string,name:string,author:string,pagecount: integer,Inventory:integer}
 
 		delete:       	e.g.value=string
 
@@ -173,12 +190,16 @@ func Help() (string, error) {
 
 // get json string and parse it to the book.
 func UnarshalStringOne(input string) (map[string]string, error) {
+	if !strings.Contains(input, "{") || !strings.Contains(input, "}") {
+		return nil, errors.New(Unvalid)
+	}
 	input = strings.ReplaceAll(input, "}", "")
 	input = strings.ReplaceAll(input, "{", "")
 	splited := strings.Split(input, ",")
 	m := make(map[string]string, len(splited))
 	for _, v := range splited {
 		result := strings.Split(v, ":")
+		result[1] = strings.ReplaceAll(result[1], "\t", "")
 		m[result[0]] = result[1]
 	}
 
@@ -202,14 +223,14 @@ func UnarshalStringMany(input string) ([]map[string]string, error) {
 	return splits, nil
 }
 
-func checknull(m map[string]string) bool {
+func Checknull(m map[string]string) bool {
 	if m["name"] == "" || m["author"] == "" || m["inventory"] == "0" || m["Pagecount"] == "0" {
 		return false
 	}
 
 	return true
 }
-func checknulls(ms []map[string]string) bool {
+func Checknulls(ms []map[string]string) bool {
 	for _, m := range ms {
 		if m["name"] == "" || m["author"] == "" || m["inventory"] == "0" || m["Pagecount"] == "0" {
 			return false
