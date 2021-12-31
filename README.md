@@ -1,6 +1,9 @@
 # Simple GRPC client
 This app is a client for [this](https://github.com/Ali-Farhadnia/serverGRPC) app.
 
+##Config
+```json
+```
 ## Usage
 ### help
 ```sh
