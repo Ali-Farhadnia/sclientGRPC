@@ -3,6 +3,12 @@ This app is a client for [this](https://github.com/Ali-Farhadnia/serverGRPC) app
 
 ##Config
 ```json
+{
+    "grpc_config":{
+        "host":"37.152.177.253",
+        "port":"8083"
+    }
+}
 ```
 ## Usage
 ### help
