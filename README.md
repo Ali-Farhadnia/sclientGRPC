@@ -1,7 +1,8 @@
 # Simple GRPC client
 This app is a client for [this](https://github.com/Ali-Farhadnia/serverGRPC) app.
 
-##Config
+## Config
+This is default configuration but you can change it in ./config.json
 ```json
 {
     "grpc_config":{
