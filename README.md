@@ -16,23 +16,46 @@ or
 ```sh
 go run main.go -k=keylist
 ```
-###Insert one book
+
+### Insert one book
 ```sh
 go run main.go -k=insert_one v=(books)
 ```
 
-e.g.
+e.g.:
 
 ```sh
 go run main.go -k=insert_one -v={name:test1,author:test1,pagecount:50,inventory:50}
 ```
-###Insert many books
+
+### Insert many books
 ```sh
 go run main.go -k=insert_many v=(book)
 ```
 
-e.g.
+e.g.:
 
 ```sh
 go run main.go -k=insert_many -v=[{name:test1,author:test1,pagecount:50,inventory:50}-{name:test2,author:test1,pagecount:50,inventory:50}-{name:test3,author:test1,pagecount:50,inventory:50}]
+```
+
+### Update one book(with book id)
+```sh
+go run main.go -k=update v=(book(with book id))
+```
+
+e.g.:
+
+```sh
+go run main.go -k=update -v={id:(some id),name:test1,author:test1,pagecount:50,inventory:50}
+```
+
+### Delete one book(with book id)
+```sh
+go run main.go -k=delete v=(id)
+```
+
+### Finde one book by id
+```sh
+go run main.go -k=find_by_id v=(id)
 ```
